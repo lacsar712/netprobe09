@@ -118,7 +118,14 @@ func ParseTWAMPJSON(b []byte) (map[string]int, error) {
 }
 
 func GrowPad(dst []byte, extra byte) []byte {
-	return append(dst, extra)
+	// Always materialize an independent backing array. If dst still has
+	// spare capacity, append(dst, extra) would reuse dst's array and the
+	// returned slice would alias it; writes to the grown slice would then
+	// pollute the original pad buffer. Copying guarantees isolation.
+	out := make([]byte, len(dst)+1)
+	copy(out, dst)
+	out[len(dst)] = extra
+	return out
 }
 
 type Probe struct {
