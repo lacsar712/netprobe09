@@ -118,7 +118,10 @@ func ParseTWAMPJSON(b []byte) (map[string]int, error) {
 }
 
 func GrowPad(dst []byte, extra byte) []byte {
-	return append(dst, extra)
+	out := make([]byte, len(dst)+1)
+	copy(out, dst)
+	out[len(dst)] = extra
+	return out
 }
 
 type Probe struct {
